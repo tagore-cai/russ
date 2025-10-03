@@ -384,14 +384,10 @@ impl AppImpl {
 
     fn page_up(&mut self) {
         if matches!(self.selected, Selected::Entry(_)) {
-            self.entry_scroll_position = if let Some(position) = self
+            self.entry_scroll_position = self
                 .entry_scroll_position
                 .checked_sub(self.entry_lines_rendered_len)
-            {
-                position
-            } else {
-                0
-            };
+                .unwrap_or_default()
         };
     }
 
@@ -430,13 +426,13 @@ impl AppImpl {
 
                 // minimum is 1
                 let line_length = if self.entry_column_width >= 5 {
-                    self.entry_column_width - 4
+                    self.entry_column_width - 2
                 } else {
                     1
                 };
 
                 if let Some(html) = entry_html {
-                    let text = html2text::from_read(html.as_bytes(), line_length.into());
+                    let text = html2text::from_read(html.as_bytes(), line_length.into())?;
                     self.entry_lines_len = text.matches('\n').count();
                     self.current_entry_text = text;
                 } else {

@@ -2,7 +2,7 @@
 name = "russ"
 version = "0.5.0"
 authors = ["Clark Kampfe <clark.kampfe@gmail.com>"]
-edition = "2021"
+edition = "2024"
 license = "AGPL-3.0-or-later"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -16,19 +16,19 @@ chrono = { version = "0.4", default-features = false, features = [
 ] }
 clap = { version = "4", features = ["derive"] }
 copypasta = "0.10"
-crossterm = "0.27"
+crossterm = "0.29"
 diligent-date-parser = "0.1"
-directories = "5"
-html2text = "0.12"
+directories = "6"
+html2text = "0.15"
 html-escape = "0.2.13"
 num_cpus = "1.16"
 opml = "1.1"
 r2d2 = "0.8"
-r2d2_sqlite = "0.24"
+r2d2_sqlite = "0.31"
 rss = { version = "2.0", default-features = false }
-rusqlite = { version = "0.31", features = ["bundled", "chrono"] }
-ratatui = "0.26"
-ureq = "2.9"
+rusqlite = { version = "0.37", features = ["bundled", "chrono"] }
+ratatui = "0.29"
+ureq = "2.12"
 webbrowser = "1"
 wsl = "0.1"
 

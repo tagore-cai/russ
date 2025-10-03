@@ -2,7 +2,7 @@
 //! of RSS/Atom feeds in Russ' SQLite database.
 
 use crate::modes::ReadMode;
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use atom_syndication as atom;
 use chrono::prelude::{DateTime, Utc};
 use html_escape::decode_html_entities_to_string;
@@ -125,9 +125,10 @@ pub struct Feed {
     pub link: Option<String>,
     pub feed_kind: FeedKind,
     pub refreshed_at: Option<chrono::DateTime<Utc>>,
-    pub inserted_at: chrono::DateTime<Utc>,
-    pub updated_at: chrono::DateTime<Utc>,
-    pub latest_etag: Option<String>,
+    // these are currently unused:
+    // pub inserted_at: chrono::DateTime<Utc>,
+    // pub updated_at: chrono::DateTime<Utc>,
+    // pub latest_etag: Option<String>,
 }
 
 /// This exists:
@@ -220,12 +221,14 @@ pub struct EntryMetadata {
     pub id: EntryId,
     pub feed_id: FeedId,
     pub title: Option<String>,
-    pub author: Option<String>,
+    // unused:
+    // pub author: Option<String>,
     pub pub_date: Option<chrono::DateTime<Utc>>,
     pub link: Option<String>,
     pub read_at: Option<chrono::DateTime<Utc>>,
     pub inserted_at: chrono::DateTime<Utc>,
-    pub updated_at: chrono::DateTime<Utc>,
+    // unused:
+    // pub updated_at: chrono::DateTime<Utc>,
 }
 
 impl EntryMetadata {
@@ -601,9 +604,9 @@ pub fn get_feed(conn: &rusqlite::Connection, feed_id: FeedId) -> Result<Feed> {
                 link: row.get(3)?,
                 feed_kind,
                 refreshed_at: row.get(5)?,
-                inserted_at: row.get(6)?,
-                updated_at: row.get(7)?,
-                latest_etag: row.get(8)?,
+                // inserted_at: row.get(6)?,
+                // updated_at: row.get(7)?,
+                // latest_etag: row.get(8)?,
             })
         },
     )?;
@@ -664,10 +667,10 @@ pub fn get_feeds(conn: &rusqlite::Connection) -> Result<Vec<Feed>> {
           feed_link, 
           link, 
           feed_kind, 
-          refreshed_at, 
-          inserted_at, 
-          updated_at,
-          latest_etag
+          refreshed_at
+          -- inserted_at,
+          -- updated_at,
+          -- latest_etag
         FROM feeds ORDER BY lower(title) ASC",
     )?;
     let mut feeds = vec![];
@@ -679,9 +682,9 @@ pub fn get_feeds(conn: &rusqlite::Connection) -> Result<Vec<Feed>> {
             link: row.get(3)?,
             feed_kind: row.get(4)?,
             refreshed_at: row.get(5)?,
-            inserted_at: row.get(6)?,
-            updated_at: row.get(7)?,
-            latest_etag: row.get(8)?,
+            // inserted_at: row.get(6)?,
+            // updated_at: row.get(7)?,
+            // latest_etag: row.get(8)?,
         })
     })? {
         feeds.push(feed?)
@@ -703,15 +706,15 @@ pub fn get_feed_ids(conn: &rusqlite::Connection) -> Result<Vec<FeedId>> {
 pub fn get_entry_meta(conn: &rusqlite::Connection, entry_id: EntryId) -> Result<EntryMetadata> {
     let result = conn.query_row(
         "SELECT 
-          id, 
-          feed_id, 
-          title, 
-          author, 
-          pub_date, 
-          link, 
-          read_at, 
-          inserted_at, 
-          updated_at 
+          id,
+          feed_id,
+          title,
+          -- author,
+          pub_date,
+          link,
+          read_at,
+          inserted_at
+          -- updated_at
         FROM entries WHERE id=?1",
         [entry_id],
         |row| {
@@ -719,12 +722,12 @@ pub fn get_entry_meta(conn: &rusqlite::Connection, entry_id: EntryId) -> Result<
                 id: row.get(0)?,
                 feed_id: row.get(1)?,
                 title: row.get(2)?,
-                author: row.get(3)?,
-                pub_date: row.get(4)?,
-                link: row.get(5)?,
-                read_at: row.get(6)?,
-                inserted_at: row.get(7)?,
-                updated_at: row.get(8)?,
+                // author: row.get(3)?,
+                pub_date: row.get(3)?,
+                link: row.get(4)?,
+                read_at: row.get(5)?,
+                inserted_at: row.get(6)?,
+                // updated_at: row.get(8)?,
             })
         },
     )?;
@@ -761,15 +764,15 @@ pub fn get_entries_metas(
     // we get weird pubDate formats from feeds,
     // so sort by inserted at as this as a stable order at least
     let mut query = "SELECT 
-        id, 
-        feed_id, 
-        title, 
-        author, 
-        pub_date, 
-        link, 
-        read_at, 
-        inserted_at, 
-        updated_at 
+        id,
+        feed_id,
+        title,
+        -- author,
+        pub_date,
+        link,
+        read_at,
+        inserted_at
+        -- updated_at
         FROM entries 
         WHERE feed_id=?1"
         .to_string();
@@ -784,12 +787,14 @@ pub fn get_entries_metas(
             id: row.get(0)?,
             feed_id: row.get(1)?,
             title: row.get(2)?,
-            author: row.get(3)?,
-            pub_date: row.get(4)?,
-            link: row.get(5)?,
-            read_at: row.get(6)?,
-            inserted_at: row.get(7)?,
-            updated_at: row.get(8)?,
+            // unused:
+            // author: row.get(3)?,
+            pub_date: row.get(3)?,
+            link: row.get(4)?,
+            read_at: row.get(5)?,
+            inserted_at: row.get(6)?,
+            // unused:
+            // updated_at: row.get(8)?,
         })
     })? {
         entries.push(entry?)

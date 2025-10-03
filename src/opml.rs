@@ -27,14 +27,14 @@ pub(crate) fn import(options: ImportOptions) -> Result<()> {
 
     for feed_url in feed_urls {
         eprintln!(">>>>>>>>>>");
-        eprintln!("{}: starting import", feed_url);
+        eprintln!("{feed_url}: starting import");
         match crate::rss::subscribe_to_feed(&http_client, &mut conn, &feed_url) {
             Ok(_feed_id) => {
                 eprintln!("{feed_url}: OK");
                 successful_imports += 1;
             }
             Err(e) => {
-                eprintln!("ERROR: {:?}", e);
+                eprintln!("ERROR: {e:?}");
                 failed_imports.push(feed_url);
             }
         };

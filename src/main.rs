@@ -8,10 +8,10 @@ use crossterm::event::{self, KeyEvent, KeyEventKind};
 use crossterm::event::{Event as CEvent, KeyCode, KeyModifiers};
 use crossterm::execute;
 use crossterm::terminal::{
-    disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
+    EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode,
 };
-use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
+use ratatui::backend::CrosstermBackend;
 use std::io::stdout;
 use std::path::PathBuf;
 use std::sync::mpsc;
@@ -171,6 +171,7 @@ fn run_reader(options: ReadOptions) -> Result<()> {
     enable_raw_mode()?;
 
     let mut stdout = stdout();
+
     execute!(stdout, EnterAlternateScreen)?;
 
     let backend = CrosstermBackend::new(stdout);
@@ -191,12 +192,11 @@ fn run_reader(options: ReadOptions) -> Result<()> {
             // poll for tick rate duration, if no events, sent tick event.
             if event::poll(tick_rate - last_tick.elapsed())
                 .expect("Unable to poll for Crossterm event")
+                && let CEvent::Key(key) = event::read().expect("Unable to read Crossterm event")
             {
-                if let CEvent::Key(key) = event::read().expect("Unable to read Crossterm event") {
-                    event_tx
-                        .send(Event::Input(key))
-                        .expect("Unable to send Crossterm Key input event");
-                }
+                event_tx
+                    .send(Event::Input(key))
+                    .expect("Unable to send Crossterm Key input event");
             }
             if last_tick.elapsed() >= tick_rate {
                 event_tx.send(Event::Tick).expect("Unable to send tick");
